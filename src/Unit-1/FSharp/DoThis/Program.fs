@@ -2,6 +2,7 @@
 open Akka.FSharp
 open Akka.FSharp.Spawn
 open Akka.Actor
+open Actors
 
 let printInstructions () =
     Console.WriteLine "Write whatever you want into the console!"
@@ -20,15 +21,16 @@ let printInstructions () =
 [<EntryPoint>]
 let main argv = 
     // initialize an actor system
-    // YOU NEED TO FILL IN HERE
+    let myActorSystem = ActorSystem.Create "MyActorSystem" 
     
     printInstructions ()
     
     // make your first actors using the 'spawn' function
-    // YOU NEED TO FILL IN HERE
-
+    let writerRef = spawn myActorSystem "writer" (actorOf consoleWriterActor)
+    let readerRef = spawn myActorSystem "reader" (actorOf2 (consoleReaderActor writerRef))
+    
     // tell the consoleReader actor to begin
-    // YOU NEED TO FILL IN HERE
+    readerRef <! "start"
 
     myActorSystem.AwaitTermination ()
     0
