@@ -23,6 +23,6 @@ let main argv =
     printInstructions ()
     let consoleWriterActor = spawn myActorSystem "consoleWriterActor" (actorOf Actors.consoleWriterActor)
     let consoleReaderActor = spawn myActorSystem "consoleReaderActor" (actorOf2 (Actors.consoleReaderActor consoleWriterActor))
-    consoleReaderActor <! "start"
+    consoleReaderActor <! Messages.StartCommand
     myActorSystem.AwaitTermination ()
     0
