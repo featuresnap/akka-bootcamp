@@ -9,32 +9,41 @@ open Utility
 [<Literal>]
 let ExitCommand = "exit"
 
-[<Literal>]
-let ContinueCommand = "continue"
-
 let consoleReaderActor (consoleWriter: ActorRef) (mailbox: Actor<_>) (message:obj) = 
+    let self = mailbox.Self
+
+    let isValid s = String.length s % 2 = 0
+
+    let getAndValidateInput () = 
+        let line = Console.ReadLine()
+        match line with 
+        |ExitCommand -> mailbox.Context.System.Shutdown ()
+        |s when s |> String.IsNullOrEmpty -> self <! InputFailure(InputNull, "Input was null or empty")
+        |_ -> 
+            if line |> isValid  
+            then self <! InputSuccess("Thanks for your input")
+            else self <! InputFailure(ValidationFailed, "Input did not have an even number of characters")
+            
     match message with 
     | :? StartCommand -> 
         do printInstructions() |> ignore
-        mailbox.Self <! ContinueCommand
-    |_ ->
+        self <! ContinueProcessing
+    | :? InputResult -> 
+        consoleWriter <! message
+        self <! ContinueProcessing
+    |_ -> getAndValidateInput()
         
-        let line = Console.ReadLine ()
-        match line.ToLower () with
-        | ExitCommand -> mailbox.Context.System.Shutdown ()
-        | _ -> 
-            consoleWriter <! line
-            mailbox.Self  <! ContinueCommand
+        
 
-let consoleWriterActor message = 
-    let (|Even|Odd|) n = if n % 2 = 0 then Even else Odd
+let consoleWriterActor (message) = 
     
     let printInColor color message =
         Console.ForegroundColor <- color
         Console.WriteLine (message.ToString ())
+        Console.WriteLine()
         Console.ResetColor ()
 
-    match message.ToString().Length with
-    | 0    -> printInColor ConsoleColor.DarkYellow "Please provide an input.\n"
-    | Even -> printInColor ConsoleColor.Red "Your string had an even # of characters.\n"
-    | Odd  -> printInColor ConsoleColor.Green "Your string had an odd # of characters.\n"
+    match message with
+    | InputFailure(InputNull, reason) -> printInColor ConsoleColor.DarkYellow reason
+    | InputFailure(ValidationFailed, reason) -> printInColor ConsoleColor.Red reason
+    | InputSuccess(reason) -> printInColor ConsoleColor.Green reason

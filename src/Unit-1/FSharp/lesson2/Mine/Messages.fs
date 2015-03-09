@@ -1,13 +1,13 @@
 ﻿module Messages
 
 type StartCommand = |StartCommand
-type ContinueCommand = |ContinueCommand
+type ContinueProcessing = |ContinueProcessing
 
 type InputError =
     |InputNull
     |ValidationFailed
 
 type InputResult = 
-    |InputSuccess of reason:string
     |InputFailure of InputError * reason:string
+    |InputSuccess of reason:string
 
