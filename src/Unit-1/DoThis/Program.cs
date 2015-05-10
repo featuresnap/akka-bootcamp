@@ -17,7 +17,7 @@ namespace WinTail
             IActorRef consoleReaderActor = MyActorSystem.ActorOf(Props.Create(() => new ConsoleReaderActor(consoleWriterActor)));
 
             // tell console reader to begin
-            consoleReaderActor.Tell("continue");
+            consoleReaderActor.Tell("begin");
 
             // blocks the main thread from exiting until the actor system is shut down
             MyActorSystem.AwaitTermination();

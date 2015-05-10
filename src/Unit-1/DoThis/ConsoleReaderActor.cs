@@ -7,7 +7,7 @@ namespace WinTail
     /// Actor responsible for reading FROM the console. 
     /// Also responsible for calling <see cref="ActorSystem.Shutdown"/>.
     /// </summary>
-    class ConsoleReaderActor : UntypedActor
+    public class ConsoleReaderActor : UntypedActor
     {
         public const string ExitCommand = "exit";
         private IActorRef _consoleWriterActor;
@@ -20,7 +20,7 @@ namespace WinTail
         protected override void OnReceive(object message)
         {
             var consoleInput = Console.ReadLine();
-            if (!string.IsNullOrEmpty(consoleInput) && String.Equals(consoleInput, ExitCommand, StringComparison.OrdinalIgnoreCase))
+            if (IsExitCommand(consoleInput))
             {
                 Context.System.Shutdown();
                 return;
@@ -30,5 +30,9 @@ namespace WinTail
             Self.Tell("continue");
         }
 
+        private static bool IsExitCommand(string consoleInput)
+        {
+            return !string.IsNullOrEmpty(consoleInput) && String.Equals(consoleInput, ExitCommand, StringComparison.OrdinalIgnoreCase);
+        }
     }
 }
