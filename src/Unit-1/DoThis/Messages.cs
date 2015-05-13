@@ -9,18 +9,20 @@ namespace WinTail
     public class Messages
     {
         #region Neutral / System Messages
-        public class ContinueProcessing
-        {
-        }
+
+        public class ContinueProcessing{}
+
+        public class PrintInstructions{}
+ 
         #endregion
 
         #region Success Messages
 
-        public class Success
+        public class InputSuccess
         {
             public string Reason { get; private set; }
 
-            public Success(string reason)
+            public InputSuccess(string reason)
             {
                 Reason = reason;
             }
