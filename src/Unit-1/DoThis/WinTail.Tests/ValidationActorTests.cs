@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,7 +22,6 @@ namespace WinTail.Tests
             _consoleWriter = TestActor;
             _validationActor = Sys.ActorOf(Props.Create<ValidationActor>(_consoleWriter));
         }
-
 
         [TestCase(null)]
         [TestCase("")]
@@ -58,10 +57,6 @@ namespace WinTail.Tests
 
             Assert.That(senderResponse, Is.InstanceOf<Messages.ContinueProcessing>());
         }
-
-
-
-
 
     }
 }
