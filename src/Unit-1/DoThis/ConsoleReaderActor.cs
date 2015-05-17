@@ -12,11 +12,11 @@ namespace WinTail
         public const string ExitCommand = "exit";
         public const string StartCommand = "start";
 
-        private IActorRef _consoleWriterActor;
+        private IActorRef _validationActor;
 
-        public ConsoleReaderActor(IActorRef consoleWriterActor)
+        public ConsoleReaderActor(IActorRef validationActor)
         {
-            _consoleWriterActor = consoleWriterActor;
+            _validationActor = validationActor;
         }
 
         protected override void OnReceive(object message)
@@ -24,49 +24,36 @@ namespace WinTail
             if (IsStartCommand(message)) {DoPrintInstructions(); }
 
             GetAndValidateInput();
-
-            Self.Tell(new Messages.ContinueProcessing());
         }
 
         private void GetAndValidateInput()
         {
             var consoleInput = Console.ReadLine();
-            if (string.IsNullOrEmpty(consoleInput))
+
+            if(IsExitCommand(consoleInput))
             {
-                _consoleWriterActor.Tell(new Messages.NullInputError("Please enter one or more characters."));
-            }
-            else if(IsExitCommand(consoleInput)) 
-            {
-                HandleExit();
+                Context.System.Shutdown();
             }
             else
             {
-                var valid = IsValid(consoleInput);
-                if (valid)
-                {
-                    _consoleWriterActor.Tell(new Messages.InputSuccess("Thank you. Input was valid."));
-                }
-                else
-                {
-                    _consoleWriterActor.Tell(new Messages.ValidationError("Sorry. Input was not valid."));
-                }
+                _validationActor.Tell(consoleInput);
             }
-            
-        }
-
-        private void HandleExit()
-        {
-            Context.System.Shutdown();
-        }
-
-        private bool IsValid(string input)
-        {
-            return input.Length%2 == 0;
         }
 
         private void DoPrintInstructions()
         {
-            _consoleWriterActor.Tell(new Messages.PrintInstructions());
+            Console.WriteLine("Write whatever you want into the console!");
+            Console.Write("Some lines will appear as");
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.Write(" red ");
+            Console.ResetColor();
+            Console.Write(" and others will appear as");
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(" green! ");
+            Console.ResetColor();
+            Console.WriteLine();
+            Console.WriteLine();
+            Console.WriteLine("Type 'exit' to quit this application at any time.\n");
         }
 
         private bool IsStartCommand(object message)
@@ -76,7 +63,7 @@ namespace WinTail
 
         private static bool IsExitCommand(string consoleInput)
         {
-            return !string.IsNullOrEmpty(consoleInput) && String.Equals(consoleInput, ExitCommand, StringComparison.OrdinalIgnoreCase);
+            return !String.IsNullOrEmpty(consoleInput) && String.Equals(consoleInput, ExitCommand, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

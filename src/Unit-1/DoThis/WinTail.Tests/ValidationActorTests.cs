@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Akka.Actor;
+using Akka.Dispatch.SysMsg;
 using Akka.TestKit;
 using Akka.TestKit.NUnit;
 using NUnit.Framework;
@@ -49,15 +51,15 @@ namespace WinTail.Tests
             ExpectMsg<Messages.ValidationError>();
         }
 
-        [Test]
-        public async Task  ValidationActor_Tells_Sender_ContinueProcessing()
-        {
-            var input = "f";
+        //[Test]
+        //public async Task  ValidationActor_Tells_Sender_ContinueProcessing()
+        //{
+        //    var input = "f";
 
-            var senderResponse =  await _validationActor.Ask("Foo", TimeSpan.FromSeconds(3.0));
+        //    var senderResponse =  await _validationActor.Ask("Foo", TimeSpan.FromSeconds(3.0));
 
-            Assert.That(senderResponse, Is.InstanceOf<Messages.ContinueProcessing>());
-        }
+        //    Assert.That(senderResponse, Is.InstanceOf<Messages.ContinueProcessing>());
+        //}
 
 
 
