@@ -32,6 +32,7 @@ namespace WinTail
             _watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite;
             _watcher.Changed += OnFileChanged;
             _watcher.Error += OnFileError;
+            
             _watcher.EnableRaisingEvents = true;
         }
 
