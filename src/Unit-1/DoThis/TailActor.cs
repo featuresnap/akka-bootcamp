@@ -55,15 +55,28 @@ namespace WinTail
             _reporterActor = reporterActor;
             _filePath = filePath;
             
+        }
+
+        protected override void PreStart()
+        {
             _observer = new FileObserver(Self, Path.GetFullPath(_filePath));
             _observer.Start();
-            
+
             _fileStream = new FileStream(Path.GetFullPath(_filePath), FileMode.Open, FileAccess.Read,
                 FileShare.ReadWrite);
             _fileStreamReader = new StreamReader(_fileStream);
 
             var text = _fileStreamReader.ReadToEnd();
             Self.Tell(new InitialRead(_filePath, text));
+        }
+
+        protected override void PostStop()
+        {
+            _observer.Dispose();
+            _observer=null;
+            _fileStreamReader.Close();
+            _fileStreamReader.Dispose();
+            base.PostStop();
         }
 
         protected override void OnReceive(object message)
