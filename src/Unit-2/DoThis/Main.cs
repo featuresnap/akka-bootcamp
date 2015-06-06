@@ -68,6 +68,16 @@ namespace ChartApp
         {
             _chartActor.Tell(new ChartingActor.TogglePause());
         }
+        
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //shut down the charting actor
+            _chartActor.Tell(PoisonPill.Instance);
+
+            //shut down the ActorSystem
+            Program.ChartActors.Shutdown();
+        }
+
 
     }
 }
