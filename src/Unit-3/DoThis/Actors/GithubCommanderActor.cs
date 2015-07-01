@@ -47,6 +47,7 @@ namespace GithubActors.Actors
         private IActorRef _coordinator;
         private IActorRef _canAcceptJobSender;
         private int pendingJobReplies;
+        private RepoKey _repoJob;
 
         public GithubCommanderActor()
         {
@@ -58,6 +59,7 @@ namespace GithubActors.Actors
             Receive<CanAcceptJob>(job =>
             {
                 _coordinator.Tell(job);
+                _repoJob = job.Repo;
                 BecomeAsking();
             });
         }
@@ -69,6 +71,7 @@ namespace GithubActors.Actors
                 .Ask<Routees>(new GetRoutees())
                 .Result.Members.Count();
             Become(Asking);
+            Context.SetReceiveTimeout(TimeSpan.FromSeconds(3));
         }
 
         private void Asking()
